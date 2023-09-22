@@ -1,5 +1,8 @@
+import { signIn } from "next-auth/react"
 import { useCallback, useState } from "react"
 import Input from "@/components/Input";
+import axios from "axios";
+import { useRouter } from "next/router";
 
 const Auth = () => {
     const [name, setName] = useState('')
@@ -8,10 +11,42 @@ const Auth = () => {
 
     const [variant, setVariant] = useState('login')
 
+    const router = useRouter()
+
     const toggleVariant = useCallback(() => {
         setVariant((currentVariant) => currentVariant === 'login' ? "register" : "login")
     },[])
 
+    const login = useCallback( async () => { 
+        try {
+            await signIn("credentials", {
+                email,
+                password,
+                redirect: false,
+                callbackUrl: "/"
+            })   
+            router.push("/")
+            return
+        } catch (error) {
+            console.log(error);
+            
+        }        
+    }, [email, password, router])
+    
+    const register = useCallback( async () => {
+        try {
+            await axios.post("/api/register", {
+                email,
+                name,
+                password,
+            })
+            login()
+            
+        } catch (error) {
+            console.log(error);
+        }
+    }, [email, name, password, login])
+    
     return (
         <div className="relative h-full w-full bg-[url('/images/hero.jpg')] bg-no-repeat bg-center bg-fixed bg-cover">
             <div className="bg-black h-full w-full lg:bg-opacity-50">
@@ -47,8 +82,8 @@ const Auth = () => {
                                 value={password}
                             /> 
                         </div>
-                        <button className="bg-red-600 hover:bg-red-700 text-white w-full py-3 rounded-md mt-10 transition">
-                            {variant !== "login" ? "Create" : "Login"}
+                        <button onClick={variant !== "login" ? register : login} className="bg-red-600 hover:bg-red-700 text-white w-full py-3 rounded-md mt-10 transition">
+                            {variant !== "login" ? "Sign up" : "Login"}
                         </button>
                         <p className="text-neutral-500 mt-12">
                             {variant !== "login" ? "Already have an account?" : "Frist time using Netflix?"} 
@@ -56,7 +91,6 @@ const Auth = () => {
                                 {variant !== "login" ? "Login" : "Create an account" }
                             </span>
                         </p>
-     
                     </div>
                 </div>
             </div>
