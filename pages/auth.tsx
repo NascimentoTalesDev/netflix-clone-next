@@ -3,6 +3,7 @@ import { useCallback, useState } from "react"
 import Input from "@/components/Input";
 import axios from "axios";
 import { useRouter } from "next/router";
+import { data } from "autoprefixer";
 
 const Auth = () => {
     const [name, setName] = useState('')
@@ -24,12 +25,17 @@ const Auth = () => {
                 password,
                 redirect: false,
                 callbackUrl: "/"
+            }).then(Response => {
+                console.log(Response);
+                
+                if(!Response?.error){
+                    router.push("/")
+                    return
+                }
+                return
             })   
-            router.push("/")
-            return
         } catch (error) {
             console.log(error);
-            
         }        
     }, [email, password, router])
     
@@ -41,7 +47,6 @@ const Auth = () => {
                 password,
             })
             login()
-            
         } catch (error) {
             console.log(error);
         }

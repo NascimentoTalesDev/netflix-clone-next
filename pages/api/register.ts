@@ -6,18 +6,31 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (req.method !== "POST") {
         return res.status(405).end()
     }
-    try {
-        const { email, name, password } = req.body
-        
-        const existingUser = await prismadb.user.findUnique({
-            where: {
-                email
-            }
-        });
+    const { email, name, password } = req.body
 
-        if (existingUser) {
-            return res.status(422).json({error: "Email taken"})
+    if (!name) {
+        return res.status(400).json({ message: "Username is required"})
+    }
+
+    if (!email) {
+        return res.status(400).json({ message: "Email is required"})
+    }
+
+    if (!password) {
+        return res.status(400).json({ message: "Password is required"})
+    }
+
+    const existingUser = await prismadb.user.findUnique({
+        where: {
+            email
         }
+    });
+
+    if (existingUser) {
+        return res.status(422).json({error: "Email already in use!"})
+    }
+
+    try {
 
         const hashedPassword = await bcrypt.hash(password, 12)
 
