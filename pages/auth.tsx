@@ -3,7 +3,9 @@ import { useCallback, useState } from "react"
 import Input from "@/components/Input";
 import axios from "axios";
 import { useRouter } from "next/router";
-import { data } from "autoprefixer";
+import { FcGoogle } from "react-icons/fc"
+import { FaGithub } from "react-icons/fa"
+
 
 const Auth = () => {
     const [name, setName] = useState('')
@@ -90,8 +92,16 @@ const Auth = () => {
                         <button onClick={variant !== "login" ? register : login} className="bg-red-600 hover:bg-red-700 text-white w-full py-3 rounded-md mt-10 transition">
                             {variant !== "login" ? "Sign up" : "Login"}
                         </button>
+                        <div className="flex flex-row items-center gap-4 mt-8 justify-center">
+                            <div onClick={() => signIn("google", {callbackUrl: "/"})} className="w-10 h-10 rounded-full bg-white transition flex items-center justify-center cursor-pointer hover:opacity-80">
+                                <FcGoogle size={30}/>
+                            </div>
+                            <div onClick={() => signIn("github", {callbackUrl: "/" })} className="w-10 h-10 rounded-full bg-white transition flex items-center justify-center cursor-pointer hover:opacity-80">
+                                <FaGithub size={30}/>
+                            </div>
+                        </div>
                         <p className="text-neutral-500 mt-12">
-                            {variant !== "login" ? "Already have an account?" : "Frist time using Netflix?"} 
+                            {variant !== "login" ? "Already have an account?" : "First time using Netflix?"} 
                             <span onClick={toggleVariant} className="text-white ml-1 hover:underline cursor-pointer">
                                 {variant !== "login" ? "Login" : "Create an account" }
                             </span>
