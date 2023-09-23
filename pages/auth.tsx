@@ -47,7 +47,7 @@ const Auth = () => {
                     router.push("/")
                     return
                 }
-                console.log(Response?.error);
+
                 setError(true)
                 if (Response?.error === "Email is required!") {
                     setMessageEmailError(Response?.error);
@@ -58,7 +58,7 @@ const Auth = () => {
                 if (Response?.error === "Email do not exist!") {
                     setMessageUserNotExistError(Response?.error);
                 }
-                if (Response?.error === "Email do not exist!") {
+                if (Response?.error === "Incorrect password!") {
                     setMessagePasswordNotMachError(Response?.error);
                 }
                 setTimeout(() => {

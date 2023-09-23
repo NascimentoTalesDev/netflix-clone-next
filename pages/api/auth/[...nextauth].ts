@@ -54,7 +54,7 @@ export default NextAuth({
                 const isCorrectPassword = await compare(credentials.password, user.hashedPassword)
 
                 if (!isCorrectPassword) {
-                    throw new Error('Incorrect password') 
+                    throw new Error('Incorrect password!') 
                 }
 
                 return user
