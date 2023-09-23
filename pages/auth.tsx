@@ -5,7 +5,7 @@ import axios from "axios";
 import { useRouter } from "next/router";
 import { FcGoogle } from "react-icons/fc"
 import { FaGithub } from "react-icons/fa"
-
+import Spinner from "@/components/Spinner";
 
 const Auth = () => {
     const [name, setName] = useState('')
@@ -13,6 +13,18 @@ const Auth = () => {
     const [password, setPassword] = useState('')
 
     const [variant, setVariant] = useState('login')
+    const [erro, setError] = useState(false)
+
+    const [messageNameError, setMessageNameError] = useState("")
+    const [messageEmailError, setMessageEmailError] = useState("")
+    const [messagePasswordError, setMessagePasswordError] = useState("")
+    
+    const [messageEmailInUseError, setMessageEmailInUseError] = useState("")
+    
+    const [messageUserNotExistError, setMessageUserNotExistError] = useState("")
+    const [messagePasswordNotMachError, setMessagePasswordNotMachError] = useState("")
+
+    const [isLoading, setIsLoading] = useState(false)
 
     const router = useRouter()
 
@@ -21,6 +33,8 @@ const Auth = () => {
     },[])
 
     const login = useCallback( async () => { 
+        setIsLoading(true)
+
         try {
             await signIn("credentials", {
                 email,
@@ -28,20 +42,43 @@ const Auth = () => {
                 redirect: false,
                 callbackUrl: "/"
             }).then(Response => {
-                console.log(Response);
                 
                 if(!Response?.error){
                     router.push("/")
                     return
                 }
+                console.log(Response?.error);
+                setError(true)
+                if (Response?.error === "Email is required!") {
+                    setMessageEmailError(Response?.error);
+                }
+                if (Response?.error === "Password is required!") {
+                    setMessagePasswordError(Response?.error);
+                }
+                if (Response?.error === "Email do not exist!") {
+                    setMessageUserNotExistError(Response?.error);
+                }
+                if (Response?.error === "Email do not exist!") {
+                    setMessagePasswordNotMachError(Response?.error);
+                }
+                setTimeout(() => {
+                    setIsLoading(false)
+                    setMessageUserNotExistError("")
+                    setMessagePasswordNotMachError("")
+                    setMessageEmailError("")
+                    setMessagePasswordError("") 
+                    setError(false)
+                }, 1000);
                 return
             })   
-        } catch (error) {
-            console.log(error);
+        } catch (error) {            
+            console.log(error)
         }        
     }, [email, password, router])
     
     const register = useCallback( async () => {
+        
+        setIsLoading(true)
         try {
             await axios.post("/api/register", {
                 email,
@@ -50,7 +87,28 @@ const Auth = () => {
             })
             login()
         } catch (error) {
-            console.log(error);
+            
+            setError(true)
+            if (error?.response.data.type === "name") {
+                setMessageNameError(error?.response.data.message);
+            }
+            if (error?.response.data.type === "email") {
+                setMessageEmailError(error?.response.data.message);
+            }
+            if (error?.response.data.type === "password") {
+                setMessagePasswordError(error?.response.data.message);
+            }
+            if (error?.response.data.type === "email in use") {
+                setMessageEmailInUseError(error?.response.data.message);
+            }
+            setTimeout(() => {
+                setIsLoading(false)
+                setMessageEmailInUseError("")
+                setMessageNameError("")
+                setMessageEmailError("")
+                setMessagePasswordError("") 
+                setError(false)
+            }, 1000);
         }
     }, [email, name, password, login])
     
@@ -62,36 +120,64 @@ const Auth = () => {
                 </nav>
                 <div className="flex justify-center">
                     <div className="bg-black bg-opacity-70 px-16 py-16 self-center mt-2 lg:w-2/5 lg:max-w-md rounded-md w-full">
+                        <p className="text-red-600">
+                            {messageUserNotExistError}
+                        </p>
+                        <p className="text-red-600">
+                            {messagePasswordNotMachError}
+                        </p>
+                        <p className="text-red-600">
+                            {messageEmailInUseError}
+                        </p>
+                        
                         <h2 className="text-white text-4xl mb-8 font-semibold">
                             {variant === 'login' ? "Sign in " : "Register"}
                         </h2>
                         <div className="flex flex-col gap-4 ">
                             {variant !== "login" && (
-                                <Input 
-                                    label="Username"
-                                    value={name}
-                                    onChange={(ev: any) => setName(ev.target.value)}
-                                    id="name"
-                                /> 
+                                <div>
+                                    <Input 
+                                        label="Username"
+                                        value={name}
+                                        onChange={(ev: any) => setName(ev.target.value)}
+                                        id="name"
+                                    />
+                                    <p className="text-red-600 ml-1">{messageNameError}</p>    
+                                </div>
                             )}
-                            <Input 
-                                label="Email"
-                                onChange={(ev: any) => setEmail(ev.target.value)}
-                                id="email"
-                                type="email" 
-                                value={email}
-                            /> 
-                            <Input 
-                                label="Password"
-                                onChange={(ev: any) => setPassword(ev.target.value)}
-                                id="password"
-                                type="password" 
-                                value={password}
-                            /> 
+                            <div>
+                                <Input 
+                                    label="Email"
+                                    onChange={(ev: any) => setEmail(ev.target.value)}
+                                    id="email"
+                                    type="email" 
+                                    value={email}
+                                />
+                                <p className="text-red-600 ml-1">{messageEmailError}</p>    
+                            </div>
+                            <div>
+                                <Input 
+                                    label="Password"
+                                    onChange={(ev: any) => setPassword(ev.target.value)}
+                                    id="password"
+                                    type="password" 
+                                    value={password}
+                                /> 
+                                <p className="text-red-600 ml-1">{messagePasswordError}</p>    
+                            </div>
                         </div>
-                        <button onClick={variant !== "login" ? register : login} className="bg-red-600 hover:bg-red-700 text-white w-full py-3 rounded-md mt-10 transition">
-                            {variant !== "login" ? "Sign up" : "Login"}
-                        </button>
+                        {isLoading  ?
+                            <button className="bg-red-600 hover:bg-red-700 text-white w-full py-3 rounded-md mt-10 transition flex justify-center items-center">
+                                <Spinner />
+                            </button>
+                            :
+                            <button onClick={variant !== "login" ? register : login} className="bg-red-600 hover:bg-red-700 text-white w-full py-3 rounded-md mt-10 transition flex justify-center items-center">
+                                {variant !== "login" ? 
+                                    "Register" 
+                                    : "Login" 
+                                }
+                            </button>
+                        }
                         <div className="flex flex-row items-center gap-4 mt-8 justify-center">
                             <div onClick={() => signIn("google", {callbackUrl: "/"})} className="w-10 h-10 rounded-full bg-white transition flex items-center justify-center cursor-pointer hover:opacity-80">
                                 <FcGoogle size={30}/>

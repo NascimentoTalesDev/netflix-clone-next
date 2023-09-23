@@ -35,10 +35,10 @@ export default NextAuth({
             async authorize(credentials, req,) {
 
                 if (!credentials?.email) {
-                    throw new Error('Email is required');                 
+                    throw new Error('Email is required!');                 
                 }
                 if (!credentials?.password) {
-                    throw new Error('password required');                 
+                    throw new Error('Password is required!');                 
                 }
 
                 const user = await prismadb.user.findUnique({
@@ -48,7 +48,7 @@ export default NextAuth({
                 });
 
                 if (!user || !user.hashedPassword) {
-                    throw new Error('Email do not exist');
+                    throw new Error('Email do not exist!');
                 }
 
                 const isCorrectPassword = await compare(credentials.password, user.hashedPassword)

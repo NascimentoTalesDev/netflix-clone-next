@@ -9,15 +9,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const { email, name, password } = req.body
 
     if (!name) {
-        return res.status(400).json({ message: "Username is required"})
+        return res.status(400).json({ type:"name", message: "Username is required!"})
     }
 
     if (!email) {
-        return res.status(400).json({ message: "Email is required"})
+        return res.status(400).json({ type:"email", message: "Email is required!"})
     }
 
     if (!password) {
-        return res.status(400).json({ message: "Password is required"})
+        return res.status(400).json({ type:"password", message: "Password is required!" })
     }
 
     const existingUser = await prismadb.user.findUnique({
@@ -27,7 +27,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     });
 
     if (existingUser) {
-        return res.status(422).json({error: "Email already in use!"})
+        return res.status(422).json({ type:"email in use", message: "Email already in use!" })
     }
 
     try {
