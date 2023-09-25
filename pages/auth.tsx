@@ -6,6 +6,7 @@ import { useRouter } from "next/router";
 import { FcGoogle } from "react-icons/fc"
 import { FaGithub } from "react-icons/fa"
 import Spinner from "@/components/Spinner";
+import { setInterval } from "timers/promises";
 
 const Auth = () => {
     const [name, setName] = useState('')
@@ -32,6 +33,40 @@ const Auth = () => {
         setVariant((currentVariant) => currentVariant === 'login' ? "register" : "login")
     },[])
 
+    const logInGoogle = useCallback( async () => {
+        setIsLoading(true)
+        try {
+            await signIn('google', {
+                redirect: false,
+                callbackUrl: "/profile"
+            })
+            setTimeout(() => {
+                setIsLoading(false)    
+            }, 10000);
+
+        } catch (error) {
+            console.log(error);
+            setIsLoading(false)
+        }
+    },[])
+
+    const logInGithub = useCallback( async () => {
+        setIsLoading(true)
+        try {
+            await signIn('github', {
+                redirect: false,
+                callbackUrl: "/profile"
+            })
+            setTimeout(() => {
+                setIsLoading(false)    
+            }, 10000);
+
+        } catch (error) {
+            console.log(error);
+            setIsLoading(false)
+        }
+    },[])
+
     const login = useCallback( async () => { 
         setIsLoading(true)
 
@@ -40,7 +75,7 @@ const Auth = () => {
                 email,
                 password,
                 redirect: false,
-                callbackUrl: "/"
+                callbackUrl: "/profile"
             }).then(Response => {
                 
                 if(!Response?.error){
@@ -73,7 +108,8 @@ const Auth = () => {
             })   
         } catch (error) {            
             console.log(error)
-        }        
+        }   
+
     }, [email, password, router])
     
     const register = useCallback( async () => {
@@ -113,13 +149,13 @@ const Auth = () => {
     }, [email, name, password, login])
     
     return (
-        <div className="relative h-full w-full bg-[url('/images/hero.jpg')] bg-no-repeat bg-center bg-fixed bg-cover">
+        <div className="relative h-full w-full bg-[url('/images/hero.jpg')]  bg-center bg-fixed bg-cover">
             <div className="bg-black h-full w-full lg:bg-opacity-50">
-                <nav className="px-12 py-5">
+                <nav className="px-12 pt-5">
                     <img src="/images/logo.png" alt="Logo" className="h-12"/>
                 </nav>
-                <div className="flex justify-center">
-                    <div className="bg-black bg-opacity-70 px-16 py-16 self-center mt-2 lg:w-2/5 lg:max-w-md rounded-md w-full">
+                <div className="flex justify-center items-center">
+                    <div className="bg-black bg-opacity-70 px-16 py-5 self-center mt-2 lg:w-2/5 lg:max-w-md rounded-md w-full">
                         <p className="text-red-600">
                             {messageUserNotExistError}
                         </p>
@@ -171,21 +207,24 @@ const Auth = () => {
                                 <Spinner />
                             </button>
                             :
-                            <button onClick={variant !== "login" ? register : login} className="bg-red-600 hover:bg-red-700 text-white w-full py-3 rounded-md mt-10 transition flex justify-center items-center">
-                                {variant !== "login" ? 
-                                    "Register" 
-                                    : "Login" 
-                                }
-                            </button>
+                            <>
+                                <button onClick={variant !== "login" ? register : login} className="bg-red-600 hover:bg-red-700 text-white w-full py-3 rounded-md mt-10 transition flex justify-center items-center">
+                                    {variant !== "login" ? 
+                                        "Register" 
+                                        : "Login" 
+                                    }
+                                </button>
+
+                                <div className="flex flex-row items-center gap-4 mt-8 justify-center">
+                                    <div onClick={() => logInGoogle()} className="w-10 h-10 rounded-full bg-white transition flex items-center justify-center cursor-pointer hover:opacity-80">
+                                        <FcGoogle size={30}/>
+                                    </div>
+                                    <div onClick={() => logInGithub()} className="w-10 h-10 rounded-full bg-white transition flex items-center justify-center cursor-pointer hover:opacity-80">
+                                        <FaGithub size={30}/>
+                                    </div>
+                                </div>
+                            </>
                         }
-                        <div className="flex flex-row items-center gap-4 mt-8 justify-center">
-                            <div onClick={() => signIn("google", {callbackUrl: "/"})} className="w-10 h-10 rounded-full bg-white transition flex items-center justify-center cursor-pointer hover:opacity-80">
-                                <FcGoogle size={30}/>
-                            </div>
-                            <div onClick={() => signIn("github", {callbackUrl: "/" })} className="w-10 h-10 rounded-full bg-white transition flex items-center justify-center cursor-pointer hover:opacity-80">
-                                <FaGithub size={30}/>
-                            </div>
-                        </div>
                         <p className="text-neutral-500 mt-12">
                             {variant !== "login" ? "Already have an account?" : "First time using Netflix?"} 
                             <span onClick={toggleVariant} className="text-white ml-1 hover:underline cursor-pointer">
