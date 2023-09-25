@@ -36,8 +36,6 @@ const Navbar = () => {
         setShowAccountMenu((current) => !current)
     },[] )
 
-
-
     return (
         <nav className="w-full fixed z-40 text-white">
             <div className={`p-4 md:px-16 py-6 flex flex-row items-center transition duration-500 ${showBackground ? "bg-zinc-900 bg-opacity-90" : " "}`}>
