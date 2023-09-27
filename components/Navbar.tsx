@@ -21,7 +21,6 @@ const Navbar = () => {
         }
 
         window.addEventListener('scroll', handleScroll)
-        console.log(showBackground);
         
         return () => {
             window.removeEventListener('scroll', handleScroll)
