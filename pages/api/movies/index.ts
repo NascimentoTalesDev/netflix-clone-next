@@ -10,8 +10,14 @@ export default async function (req: NextApiRequest, res: NextApiResponse){
 
     try {
         await serverAuth(req)
+        const movieCount = await prismadb.movie.count()
+        const movieIndex = Math.floor(Math.random() * movieCount)
 
-        const movies = await prismadb.movie.findMany()
+        const movies = await prismadb.movie.findMany({
+            orderBy:{
+                title: "asc"
+            }
+        })
         
         res.status(200).json(movies)
     } catch (error) {

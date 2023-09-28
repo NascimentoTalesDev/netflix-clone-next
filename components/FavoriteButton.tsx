@@ -1,6 +1,6 @@
 import axios from 'axios';
 import React, { useCallback, useMemo } from 'react';
-import { AiOutlinePlusCircle, AiOutlineCheck } from 'react-icons/ai';
+import { AiOutlineCheck, AiOutlinePlus } from 'react-icons/ai';
 
 import useCurrentUser from '@/hooks/useCurrentUser';
 import useFavorites from '@/hooks/useFavorites';
@@ -24,21 +24,25 @@ const FavoriteButton: React.FC<FavoriteButtonProps> = ({ movieId }) => {
     let response;
 
     if (isFavorite) {
-      response = await axios.delete('/api/favorite', { data: { movieId } });
+      response = await axios.delete("/api/favorite", {data: { currentUser, movieId }})
+
     } else {
-      response = await axios.post('/api/favorite', { movieId });
+      response = await axios.post("/api/favorite", { currentUser, movieId })
+
     }
 
-    const updatedFavoriteIds = response?.data?.favoriteIds;
+    
+    const updatedFavoriteIds = currentUser.favoriteIds
 
     mutate({ 
       ...currentUser, 
       favoriteIds: updatedFavoriteIds,
     });
+    
     mutateFavorites();
   }, [movieId, isFavorite, currentUser, mutate, mutateFavorites]);
   
-  const Icon = isFavorite ? AiOutlineCheck : AiOutlinePlusCircle;
+  const Icon = isFavorite ? AiOutlineCheck : AiOutlinePlus;
 
   return (
     <div onClick={toggleFavorites} className="cursor-pointer group/item w-6 h-6 lg:w-10 lg:h-10 border-white border-2 rounded-full flex justify-center items-center transition hover:border-neutral-300">
@@ -48,3 +52,5 @@ const FavoriteButton: React.FC<FavoriteButtonProps> = ({ movieId }) => {
 }
 
 export default FavoriteButton;
+
+
