@@ -8,6 +8,7 @@ import { compare }  from "bcrypt"
 
 
 export default NextAuth({
+
     providers: [
         GithubProvider({
             clientId: process.env.GITHUB_ID || "",
@@ -56,7 +57,7 @@ export default NextAuth({
                 if (!isCorrectPassword) {
                     throw new Error('Incorrect password!') 
                 }
-
+                
                 return user
             }
         })

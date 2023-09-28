@@ -92,12 +92,14 @@ const Auth = () => {
             await signIn("credentials", {
                 email,
                 password,
+            
                 redirect: false,
                 callbackUrl: "/profile"
-            }).then(Response => {
+            })
+            .then(Response => {
                 
                 if(!Response?.error){
-                    router.push("/")
+                    router.push("/profile")
                     return
                 }
 
