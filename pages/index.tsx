@@ -5,6 +5,7 @@ import useMovieList from '@/hooks/useMovieList';
 import useFavorites from '@/hooks/useFavorites';
 import { NextPageContext } from 'next';
 import { getSession } from 'next-auth/react';
+import useSeriesList from '@/hooks/useSeriesList';
 
 export async function getServerSideProps(context: NextPageContext) {
   const session = await getSession(context);
@@ -26,6 +27,7 @@ export async function getServerSideProps(context: NextPageContext) {
 export default function Home() {
   
   const {data : movies = []} = useMovieList()
+  const {data : series = []} = useSeriesList()
   const {data : favorites = []} = useFavorites()
 
   console.log(favorites);
@@ -37,6 +39,7 @@ export default function Home() {
       <div className='pb-40'>
         <MovieList title={"Trending Now"}  data={movies} />
         <MovieList title={"Favorites"} data={favorites} />
+        <MovieList title={"Series"} data={series} />
       </div>
     </div>
   )

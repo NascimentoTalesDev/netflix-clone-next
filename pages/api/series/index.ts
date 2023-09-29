@@ -11,9 +11,13 @@ export default async function (req: NextApiRequest, res: NextApiResponse){
     try {
         await serverAuth(req)
 
-        const movies = await prismadb.movie.findMany()
+        const series = await prismadb.movie.findMany({
+            where: {
+                category: "Series" 
+            }
+        })
         
-        res.status(200).json(movies)
+        res.status(200).json(series)
     } catch (error) {
         console.log(error);
         return res.status(200).end()
